@@ -1,0 +1,77 @@
+package application;
+	
+import javafx.application.Application;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.*;
+import javafx.scene.control.*;
+
+
+public class Main extends Application {
+	//need database or file-system for all the books
+	//need database of users
+	//book class
+	//basically need to permanently save everything
+	Button ShoppingCart = new Button("Shopping Cart Image Here");
+	Button sellSomething = new Button ("Create New Listing");
+	Scene indivBookS;
+	Scene sellBookS;
+	Scene browsingPageS;
+	Scene CartS;
+	
+	public void start(Stage primaryStage) {
+		try {
+			BorderPane root = new BorderPane();//login Scene should be here
+			Scene scene = new Scene(root,400,400);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			//different scenes we are switching between
+			indivBookS = createBookPage();
+			sellBookS = createBook2Sell();
+			browsingPageS = createBrowsingPage();
+			CartS = createCart();
+			
+			primaryStage.show();
+			//Load automatically to browsing page after login, then depending on clicks switch scenes
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+
+	
+	//scene to list a book
+	Scene createBook2Sell() {
+		return sellBookS;
+	}
+	
+	//scene for user marketplace (what they have sold, ect.)?
+	
+	Scene createBookPage(){
+		//scene for individual book, should display book user clicked on
+		Button add2cart = new Button("Add to Cart");//this should be in each
+		return indivBookS;
+		//like the viewBook() method
+		//probably need an individual book class
+	}
+	
+	//scene for browsing page, all books here, should be able to sort through them
+	Scene createBrowsingPage() {
+		//need a dropdown menu and some sorting and searching options, along with corresponding methods(alphabetically, condition, ect)
+		return browsingPageS;
+	}
+	
+	//scene for shopping cart, accessed via shopping cart button
+	Scene createCart() {
+		return CartS;
+		//viewCart()
+	}
+	
+	
+	
+	public static void main(String[] args) {
+		launch(args);
+	}
+}
