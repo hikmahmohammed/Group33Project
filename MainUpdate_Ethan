@@ -1,0 +1,324 @@
+//You can add Listings now and are now saved to folders(database works)
+//Main page populates with buttons for now of each book -- clicking them is under dev but working on it
+
+//ViewBook should be working soon, I just have to go for a bit so here's what i've done so far
+
+package application;
+	
+import javafx.application.Application;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.*;
+import javafx.scene.control.*;
+import java.util.*;
+import java.io.*;
+
+public class Main extends Application {
+	Button LogInButton1 = new Button ("Login");
+	TextField userName = new TextField();
+	TextField passWord = new TextField();
+	VBox loginVBox = new VBox();
+	BorderPane browsingPane = new BorderPane();
+	BorderPane cartPane = new BorderPane();
+	BorderPane sellPane = new BorderPane();
+	Scene indivBookS;
+	Scene sellBookS;
+	Scene browsingPageS;
+	VBox  listOfMerchHere = new VBox();
+	VBox  cartVBox = new VBox();
+	VBox  sellVBox = new VBox();
+	HBox  browsingHeader = new HBox();
+	HBox searchOptions = new HBox();
+	Scene CartS;
+	//Book myBook;
+	Stage stage1;
+   
+   
+   public String currentID;//changes with each log in -- CURRENT USER
+	
+	public void start(Stage primaryStage) {
+		try {
+			stage1 = primaryStage;
+			BorderPane root = new BorderPane();
+			loginVBox.getChildren().addAll(userName,passWord,LogInButton1);
+         currentID = userName.getText(); //idk need ID through User database
+			root.setCenter(loginVBox);
+			//login Scene should be here
+			Scene scene = new Scene(root,400,400);
+			//scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			stage1.setScene(scene);
+         
+			LogInButton1.setOnAction(e-> {
+            browsingPageS = createBrowsingPage(primaryStage);
+            stage1.setScene(browsingPageS);
+         });
+         
+			//different scenes we are switching between
+			sellBookS = listBook();
+			CartS = createCart();
+			
+			stage1.show();
+			//Load automatically to browsing page after login, then depending on clicks switch scenes
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//scene to list a book
+	Scene createBook2Sell() 
+   {
+		Button goBack = new Button ("Back");
+		Label sellHere = new Label("Add Book to MarketPlace Page");
+		sellBookS = new Scene(sellPane,400,400);
+		sellVBox.getChildren().addAll(sellHere, goBack);
+		sellPane.setCenter(sellVBox);
+		
+		goBack.setOnAction(e-> stage1.setScene(browsingPageS));
+		return sellBookS;
+	}
+	
+	//scene for user marketplace (what they have sold, ect.)?
+	
+
+//Buyer Viewpoint -- Clicks on book in marketplace
+public VBox viewIndividualBook(String ISBN)
+{
+   ArrayList<String> listing = getBookInfo(ISBN);
+   
+   VBox pane = new VBox();
+   //add pic from book to VBox
+   HBox isbnBox = new HBox();
+      Label lbIsbn = new Label("ISBN: ");
+      TextField tfIsbn = new TextField(listing.get(0));
+      tfIsbn.setEditable(false);
+      isbnBox.getChildren().addAll(lbIsbn, tfIsbn);
+   HBox titleBox = new HBox();
+      Label lbTitle = new Label("Title: ");
+      TextField tfTitle = new TextField(listing.get(1));
+      tfTitle.setEditable(false);
+      titleBox.getChildren().addAll(lbTitle, tfTitle);
+   HBox subjectBox = new HBox();
+      Label lbSubject = new Label("Subject: ");
+      TextField tfSubject = new TextField(listing.get(3));
+      tfSubject.setEditable(false);
+      subjectBox.getChildren().addAll(lbSubject, tfSubject);
+   HBox authorBox = new HBox();
+      Label lbAuthor = new Label("Author: ");
+      TextField tfAuthor = new TextField(listing.get(2));
+      tfAuthor.setEditable(false);
+      authorBox.getChildren().addAll(lbAuthor, tfAuthor);
+   HBox conditionBox = new HBox();
+      Label lbCondition = new Label("Condition: ");
+      TextField tfCondition = new TextField(listing.get(4));
+      tfCondition.setEditable(false);
+      conditionBox.getChildren().addAll(lbCondition, tfCondition);
+   HBox priceBox= new HBox();
+      Label lbPrice = new Label("Price: ");
+      TextField tfPrice = new TextField(listing.get(5));
+      tfPrice.setEditable(false);
+      priceBox.getChildren().addAll(lbPrice, tfPrice);
+   HBox statusBox= new HBox();
+      Label lbStatus = new Label("Status: ");
+      TextField tfStatus = new TextField(listing.get(6));
+      tfStatus.setEditable(false);
+      statusBox.getChildren().addAll(lbStatus, tfStatus);
+   HBox sellerIDBox= new HBox();
+      Label lbSellerID = new Label("SellerID: ");
+      TextField tfSellerID = new TextField(listing.get(7));
+      tfSellerID.setEditable(false);
+      sellerIDBox.getChildren().addAll(lbSellerID, tfSellerID);
+      
+   Button addToShoppingCart = new Button("Add to Cart");
+   pane.getChildren().addAll(isbnBox, titleBox, authorBox, subjectBox, conditionBox, priceBox, statusBox, sellerIDBox, addToShoppingCart);
+
+   addToShoppingCart.setOnAction(l -> {
+      //pull up shopping cart scene
+   });
+   
+   return pane;
+}
+      
+	
+	//scene for browsing page, all books here, should be able to sort through them
+	Scene createBrowsingPage(Stage primaryStage) {
+
+      VBox bookCollection = new VBox();
+      bookCollection.setSpacing(10);
+      File folder = new File(System.getProperty("user.dir") + "/market_listings");
+      File[] array = folder.listFiles(file -> file.exists() && file.isFile() && file.getName().startsWith("Listing_"));
+      ArrayList<File> setOfBooks;
+
+      if (array != null)
+         setOfBooks = new ArrayList<>(Arrays.asList(array));
+      else
+         setOfBooks = new ArrayList<>();
+      
+      if (setOfBooks.isEmpty())
+      {
+         System.out.print("empty");
+      }
+      else
+      {
+         for(File file : setOfBooks)
+         {
+            String info;
+            String[] splitUpInfo = new String[10];
+            try (BufferedReader br = new BufferedReader(new FileReader(file)))
+            {
+               String infoLine;
+               while ((infoLine = br.readLine()) != null)
+               {
+                  splitUpInfo = infoLine.split("\\|");
+               }
+            }
+            catch(IOException q) 
+            {
+            //exception
+            }
+            String ISBN = splitUpInfo[0]; //gets isbn;
+            ArrayList<String> currentListing = getBookInfo(ISBN);
+            System.out.println(ISBN);
+
+            Button clickBookButton = new Button(currentListing.get(1)); //get name
+            HBox completeListing = new HBox();
+            completeListing.getChildren().addAll(clickBookButton); //ADD A PICTURE AND A VBOX OF NAME/AUTHOR/ISBN
+            bookCollection.getChildren().add(completeListing);
+            
+            clickBookButton.setOnAction(p -> {
+               String isbn = currentListing.get(0);
+               String sellerid = currentListing.get(7);
+               VBox viewBookPane = viewIndividualBook(isbn);//string, string
+               Scene viewBookScene = new Scene(viewBookPane, 700,400);
+               primaryStage.setScene(viewBookScene);
+               //mainStage.show();
+            }); 
+         }
+      }
+      
+      //need a drop-down menu and some sorting and searching options, along with corresponding methods(alphabetically, condition, ect)
+
+      Label merchHere = new Label("List of Books" + "/n"+ "should be here");
+		Label search = new Label("Search Options Should Go Here");
+		Button sellB = new Button ("Click to Sell Book");
+		Button cartB = new Button ("Cart");
+		searchOptions.getChildren().addAll(search);
+		browsingHeader.getChildren().addAll(sellB,cartB);
+		listOfMerchHere.getChildren().addAll(searchOptions, bookCollection);
+		browsingPageS = new Scene(browsingPane,400,400);
+		
+		browsingPane.setCenter(listOfMerchHere);
+		browsingPane.setTop(browsingHeader);
+		
+		sellB.setOnAction(e->stage1.setScene(sellBookS));
+		cartB.setOnAction(e->stage1.setScene(CartS));
+
+		return browsingPageS;
+	}
+   
+   public boolean listingExists(String string) 
+   {
+      boolean exists = string.matches("Listing_\\d+\\.txt");
+      return exists;
+   }
+	
+	//scene for shopping cart, accessed via shopping cart button
+	Scene createCart() {
+		Button goBack = new Button ("Back");
+		Label cartLabel = new Label ("Shopping Cart Page");
+		CartS = new Scene(cartPane,400,400);
+		cartVBox.getChildren().addAll(cartLabel,goBack);
+		cartPane.setCenter(cartVBox);
+		goBack.setOnAction(e-> stage1.setScene(browsingPageS));
+		return CartS;
+		
+		//viewCart()
+	}
+   
+   public ArrayList<String> getBookInfo(String ISBN)
+   {
+   
+   //listing.get(0) = isbn 
+   //listing.get(1) = title
+   //listing.get(2) = author
+   //listing.get(3) = subject
+   //listing.get(4) = condition
+   //listing.get(5) = price
+   //listing.get(6) = isActive
+   //listing.get(7) = sellerID
+   //listing.get(8) = picture //NOT ADDED YET
+   
+      ArrayList<String> listing = new ArrayList<>(); //LIST OF SINGULAR BOOK INFO
+      File listingPath = new File(System.getProperty("user.dir") + "/market_listings/Listing_"+ ISBN +".txt"); 
+      
+      if (listingPath.exists())
+      {
+         try (BufferedReader br = new BufferedReader(new FileReader(listingPath)))
+         {
+            String infoLine = "";
+            while ((infoLine = br.readLine()) != null)
+            {
+               String[] array = infoLine.split("\\|");
+               listing = new ArrayList<>(Arrays.asList(array));
+            }
+         }
+         catch (IOException yomama)
+         {
+         //catch
+         }
+      }
+      else
+      {
+         System.out.print("Book doesn't exist yet");
+      }
+      return listing;
+   }
+	
+	//Seller Viewpoint-- Upload book info
+   public Scene listBook()
+   {
+      VBox pane = new VBox();
+      //add pic from book to VBox using Image View
+      HBox isbnBox = new HBox();
+         Label lbIsbn = new Label("ISBN: ");
+         TextField tfIsbn = new TextField();
+         isbnBox.getChildren().addAll(lbIsbn, tfIsbn);
+      HBox titleBox = new HBox();
+         Label lbTitle = new Label("Title: ");
+         TextField tfTitle = new TextField();
+         titleBox.getChildren().addAll(lbTitle, tfTitle);
+      HBox authorBox = new HBox();
+         Label lbAuthor = new Label("Author: ");
+         TextField tfAuthor = new TextField();
+         authorBox.getChildren().addAll(lbAuthor, tfAuthor);
+      HBox subjectBox = new HBox();
+         Label lbSubject = new Label("Subject: ");
+         TextField tfSubject = new TextField();
+         subjectBox.getChildren().addAll(lbSubject, tfSubject);
+      HBox conditionBox = new HBox();
+         Label lbCondition = new Label("Condition: ");
+         TextField tfCondition = new TextField();
+         conditionBox.getChildren().addAll(lbCondition, tfCondition);
+      HBox priceBox= new HBox();
+         Label lbPrice = new Label("Price: $");
+         TextField tfPrice = new TextField();
+         priceBox.getChildren().addAll(lbPrice, tfPrice);
+      Button uploadBook = new Button("Upload Listing");
+      pane.getChildren().addAll(isbnBox, titleBox, authorBox, subjectBox, conditionBox, priceBox, uploadBook);
+   
+      uploadBook.setOnAction(l -> {
+         Listing newListing = new Listing(tfTitle.getText(), tfAuthor.getText(), tfSubject.getText(), tfCondition.getText(), tfIsbn.getText(), tfIsbn.getText(), "true", currentID);
+         String condensedMaterial = newListing.fileString();
+         NewListingCreator uploadListing = new NewListingCreator(tfIsbn.getText(), condensedMaterial);//ISBN , book information
+         stage1.setScene(browsingPageS);
+      });
+      
+      return new Scene(pane, 700,700);
+   }
+
+	
+	public static void main(String[] args) {
+		launch(args);
+	}
+}
