@@ -1,0 +1,184 @@
+package application;
+	
+import javafx.application.Application;
+import javafx.collections.*;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.*;
+import javafx.scene.control.*;
+
+
+public class Main extends Application {
+	ComboBox categories = new ComboBox();
+	ObservableList <String> myList = categories.getItems();
+
+	
+	ComboBox categoriesList = new ComboBox();
+	ObservableList <String> myListSell = categoriesList.getItems();
+	
+	
+	Button LogInButton1 = new Button ("Login");
+	Button bookPrice = new Button("Book's Price");
+	
+	TextField userName = new TextField();
+	TextField passWord = new TextField();
+	VBox loginVBox = new VBox();
+
+	BorderPane browsingPane = new BorderPane();
+	BorderPane cartPane = new BorderPane();
+	BorderPane sellPane = new BorderPane();
+	BorderPane bookPagePane = new BorderPane();
+	
+	Scene indivBookS;
+	Scene sellBookS;
+	Scene browsingPageS;
+	Scene CartS;
+	
+	VBox  listOfMerchHere = new VBox();
+	VBox  cartVBox = new VBox();
+	VBox  sellVBox = new VBox();
+	
+	HBox bookInfo = new HBox();
+	HBox  browsingHeader = new HBox();
+	HBox searchOptions = new HBox();
+	
+	
+	Book myBook;
+	
+
+	
+	Stage stage1;
+	
+	public void start(Stage primaryStage) {
+		try {
+			
+			myList.add("Used - Like New");
+			myList.add("Moderately Used");
+			myList.add("Heavily Used");
+			
+			myListSell.add("Used - Like New");
+			myListSell.add("Moderately Used");
+			myListSell.add("Heavily Used");
+			
+			stage1 = primaryStage;
+			BorderPane root = new BorderPane();
+			loginVBox.getChildren().addAll(userName,passWord,LogInButton1);
+			root.setCenter(loginVBox);
+			//login Scene should be here
+			Scene scene = new Scene(root,400,400);
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			stage1.setScene(scene);
+			LogInButton1.setOnAction(e->stage1.setScene(browsingPageS));
+			//different scenes we are switching between
+			indivBookS = createBookPage();
+			sellBookS = createBook2Sell();
+			browsingPageS = createBrowsingPage();
+			CartS = createCart();
+			
+			stage1.show();
+			//Load automatically to browsing page after login, then depending on clicks switch scenes
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+
+	
+	//scene to list a book
+	Scene createBook2Sell() {
+	
+		Button goBack = new Button ("Back");
+		Label sellHere = new Label("Add Book to MarketPlace Page");
+		sellBookS = new Scene(sellPane,400,400);
+		sellVBox.getChildren().addAll(sellHere, goBack, categoriesList);
+		sellPane.setCenter(sellVBox);
+		//1. take user inputs and create a Book Object
+		//2. add that Book Object to the file of Books in the system
+		//3. make sure to add the book to the browsing page
+		
+		
+		
+		goBack.setOnAction(e-> stage1.setScene(browsingPageS));
+		return sellBookS;
+	}
+	
+	//scene for individual book, should display book user clicked on
+	Scene createBookPage(){
+		
+		Button goBack = new Button ("Back");
+		Button add2cart = new Button("Add to Cart");//this should be in each
+		Label bookImageIn = new Label("Book's Image");
+		Label bookDescription = new Label("Book's Description");
+		indivBookS = new Scene(bookPagePane, 400,400);
+		bookInfo.getChildren().addAll(add2cart,bookImageIn,bookDescription,goBack);
+		bookPagePane.setCenter(bookInfo);
+		//create page for respective book, by using the file-system to match and assemble
+		//if added to cart, add respective book to cart
+
+		
+		goBack.setOnAction(e-> stage1.setScene(browsingPageS));
+		add2cart.setOnAction(e->stage1.setScene(CartS));
+		return indivBookS;
+
+	}
+	
+	//scene for browsing page, all books here, should be able to sort through them
+	Scene createBrowsingPage() {
+		Label merchHere = new Label("List of Books" + "/n"+ "should be here");
+		Label search = new Label("Search Options Should Go Here");
+		Button sellB = new Button ("Click to Sell Book");
+		Button cartB = new Button ("Cart");
+		
+		searchOptions.getChildren().addAll(search);
+		browsingHeader.getChildren().addAll(sellB,cartB,categories);
+		listOfMerchHere.getChildren().addAll(searchOptions,merchHere, bookPrice);
+		browsingPageS = new Scene(browsingPane,400,400);
+		browsingPane.setCenter(listOfMerchHere);
+		browsingPane.setTop(browsingHeader);
+		//sort and search methods
+		//sortByCategory(listOfBooks)
+		//sortByCondition(listOfBooks)
+		//searchBook(listOfBooks) ~ this one should allow them to search by ISBN, Author, and Title
+		
+		
+		
+		bookPrice.setOnAction(e->stage1.setScene(indivBookS));
+		sellB.setOnAction(e->stage1.setScene(sellBookS));
+		cartB.setOnAction(e->stage1.setScene(CartS));
+		
+		return browsingPageS;
+	}
+	
+	//scene for shopping cart, accessed via shopping cart button
+	Scene createCart() {
+		
+		Button goBack = new Button ("Back");
+		Button buyCart = new Button ("Purchase");
+		Label cartLabel = new Label ("Shopping Cart Page");
+		CartS = new Scene(cartPane,400,400);
+		cartVBox.getChildren().addAll(cartLabel,goBack, buyCart);
+		cartPane.setCenter(cartVBox);
+		//add shipping options - noor
+		//email textfield - noor
+		//calculateCost //getPrice from each book in cart
+		
+		
+		//removeFromCart
+		//once you hit "Purchase", delete that respective book from the filesystem, and browsing page
+		//deleteBook due to situation from above
+		
+		
+		buyCart.setOnAction(e->stage1.setScene(browsingPageS));//deleteBook needed here
+		goBack.setOnAction(e-> stage1.setScene(browsingPageS));
+		return CartS;
+		
+	}
+	
+	
+	
+	public static void main(String[] args) {
+		launch(args);
+	}
+}
