@@ -1,5 +1,3 @@
-//Object for each listing that is uploaded to the Marketplace
-//I think storing everything as strings will be easiest -- but open to changes
 package application;
 import java.io.*;
 import java.util.*;
@@ -40,10 +38,10 @@ public class Listing
 //list.get(5) = price
 //list.get(6) = isActive
 //list.get(7) = sellerID
-//list.get(8) = picture //NOT ADDED YET
+
    public String fileString()
    {
-      String toString = isbn + "|" + title + "|" + author + "|" + subject + "|" + condition + "|" + price + "|" + isActive + "|" + sellerID;// + picture;
+      String toString = isbn + "|" + title + "|" + author + "|" + subject + "|" + condition + "|" + price + "|" + isActive + "|" + sellerID;
       
       return toString;
    }
