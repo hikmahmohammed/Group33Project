@@ -1,15 +1,19 @@
+//sorry for the mess lol
 //NEW SHIT:
 //added images to books, added RiRi login page for functionality
 //added permanent user database with User.java and NewUserCreator.java
 //added dropdown box on top right for some buttons
 
-//****************************************TO-DO************************************************
-//IMPORTANT -- when listing book, need to implement check to make sure everything is filled
-               //if you don't put a pic, there needs to be a default pic that is filled or something
-//still need to implement cart into this file
-//overall just error handling/input handling n shit
-//made ID generator but doesn't check if ID is already in use--potential bug but not likely
-//user database allows for duplicates--need to fix
+//--------------------------------------TO-DO--------------------------------------// 
+/*
+1. when listing book, need to implement check to make sure everything is filled
+if you don't put a pic, there needs to be a default pic that is filled or something
+2. still need to implement cart into this file
+3. overall just error handling/input handling n shit
+4. made ID generator but doesn't check if ID is already in use--potential bug but not likely
+5. user database allows for duplicates--need to fix
+6. UI design
+*/
 
 package application;
 	
