@@ -1,0 +1,106 @@
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+
+import java.util.HashMap;
+
+public class RoughLogin extends Application {
+    private HashMap<String, String> userDatabase = new HashMap<>();
+
+    @Override
+    public void start(Stage primaryStage) {
+        // Homepage
+        VBox homepage = new VBox(20);
+        homepage.setStyle("-fx-alignment: center; -fx-padding: 20; -fx-background-color: #5C4033;");
+        Label homepageLabel = new Label("SunDevil Marketplace");
+        homepageLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #F1C40F;");
+        Button registerButton = new Button("Register");
+        Button loginButton = new Button("Login");
+
+        homepage.getChildren().addAll(homepageLabel, registerButton, loginButton);
+        Scene homepageScene = new Scene(homepage, 400, 300);
+
+        // Registration Page
+        VBox registrationPage = new VBox(10);
+        registrationPage.setStyle("-fx-alignment: center; -fx-padding: 20; -fx-background-color: #5C4033;");
+        Label registrationLabel = new Label("Create Your Account");
+        registrationLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: #F1C40F;");
+        TextField emailField = new TextField();
+        emailField.setPromptText("Email Address");
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Password");
+        CheckBox newsletterCheckBox = new CheckBox("Receive news, updates, and deals");
+        Button createAccountButton = new Button("Create Account");
+        Button backToHomepageButton = new Button("Return");
+
+        registrationPage.getChildren().addAll(registrationLabel, emailField, passwordField, newsletterCheckBox, createAccountButton, backToHomepageButton);
+        Scene registrationScene = new Scene(registrationPage, 400, 300);
+
+        // Login Page
+        VBox loginPage = new VBox(10);
+        loginPage.setStyle("-fx-alignment: center; -fx-padding: 20; -fx-background-color: #5C4033;");
+        Label loginLabel = new Label("Sign In");
+        loginLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: #F1C40F;");
+        TextField loginEmailField = new TextField();
+        loginEmailField.setPromptText("Email Address");
+        PasswordField loginPasswordField = new PasswordField();
+        loginPasswordField.setPromptText("Password");
+        CheckBox rememberMeCheckBox = new CheckBox("Remember Me");
+        Button loginSubmitButton = new Button("Log In");
+        Button backToHomepageFromLoginButton = new Button("Return");
+
+        loginPage.getChildren().addAll(loginLabel, loginEmailField, loginPasswordField, rememberMeCheckBox, loginSubmitButton, backToHomepageFromLoginButton);
+        Scene loginScene = new Scene(loginPage, 400, 300);
+
+        // Event Handlers
+        registerButton.setOnAction(e -> primaryStage.setScene(registrationScene));
+        loginButton.setOnAction(e -> primaryStage.setScene(loginScene));
+        backToHomepageButton.setOnAction(e -> primaryStage.setScene(homepageScene));
+        backToHomepageFromLoginButton.setOnAction(e -> primaryStage.setScene(homepageScene));
+
+        createAccountButton.setOnAction(e -> {
+            String email = emailField.getText();
+            String password = passwordField.getText();
+            if (!email.isEmpty() && !password.isEmpty()) {
+                userDatabase.put(email, password);
+                showAlert("Success", "Account created successfully!");
+                emailField.clear();
+                passwordField.clear();
+                primaryStage.setScene(homepageScene);
+            } else {
+                showAlert("Error", "Please fill in all fields.");
+            }
+        });
+
+        loginSubmitButton.setOnAction(e -> {
+            String email = loginEmailField.getText();
+            String password = loginPasswordField.getText();
+            if (userDatabase.containsKey(email) && userDatabase.get(email).equals(password)) {
+                showAlert("Success", "Login successful!");
+                loginEmailField.clear();
+                loginPasswordField.clear();
+            } else {
+                showAlert("Error", "Invalid email or password.");
+            }
+        });
+
+        // Primary Stage
+        primaryStage.setTitle("SunDevil Marketplace");
+        primaryStage.setScene(homepageScene);
+        primaryStage.show();
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
