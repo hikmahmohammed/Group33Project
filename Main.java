@@ -18,6 +18,7 @@ if you don't put a pic, there needs to be a default pic that is filled or someth
 package application;
 	
 import javafx.application.Application;
+
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
 import javafx.scene.Scene;
@@ -46,6 +47,7 @@ public class Main extends Application {
 	Stage stage1;
    Scene homepageScene;
    final String imagesPath = "images_folder";
+   ArrayList<String> InCartISBN = new ArrayList<String>();
 
    //private HashMap<String, String> userDatabase = new HashMap<>(); //user database
    String currentID; //changes with each log in -- CURRENT USER
@@ -309,8 +311,28 @@ public class Main extends Application {
          Scene newBrowsingPage = createBrowsingPage(stage1); // Recreate the browsing page
          stage1.setScene(newBrowsingPage); // Set the new scene
       });
+      
       addToShoppingCart.setOnAction(l -> {
-         //add to shopping cart
+    	  String inCartNUMisbn = tfIsbn.getText();
+   	   //for my sake
+   	   if(InCartISBN.isEmpty()) {
+   		InCartISBN.add(inCartNUMisbn);  
+   	   }
+   	   else {
+   		   int found = 0;
+   		   for(int i = 0; i < InCartISBN.size();++i) {
+   			   if(inCartNUMisbn.equals((InCartISBN).get(i))) {
+   				   found = 1;
+   			   }
+   		   }
+   		   if(found == 0) {
+   				InCartISBN.add(inCartNUMisbn);
+   		   }
+   	   }
+
+   	   Scene newBrowsingPage = createBrowsingPage(stage1); // Recreate the browsing page
+   	   stage1.setScene(newBrowsingPage); // Set the new scene
+     
       });
       
       return pane;
@@ -384,6 +406,7 @@ public class Main extends Application {
                //exception
             }
             String ISBN = splitUpInfo[0]; //gets isbn;
+            //copy this noor
             File folder1 = new File(System.getProperty("user.dir") + "/images_folder");
             File[] array1 = folder1.listFiles(file1 -> file1.exists() && file1.isFile() && file1.getName().startsWith(ISBN));
             Image picture = new Image(array1[0].toURI().toString());
@@ -548,13 +571,19 @@ public class Main extends Application {
          Scene sellBooks = listBook();
          stage1.setScene(sellBooks);
       });
+		
 		viewCart.setOnAction(e-> {
-         Scene showCart = createCart();
-         stage1.setScene(CartS);
+			Scene newCartPage = createCart();//recreates the browsing page
+	        stage1.setScene(newCartPage);
       });
 
 		return browsingScene;
 	}
+	
+	
+	
+	
+	
    public Scene displayProfile()
    {
       VBox base = new VBox(10);
@@ -568,6 +597,7 @@ public class Main extends Application {
       });
       return newScene;
    }
+   
    public ArrayList<File> conditionFilter(ArrayList<File> ogList, String filterChoice)
    {
    //filters down the list to items that have specified condition
@@ -588,6 +618,8 @@ public class Main extends Application {
       }
       return ogList;
    }
+   
+   
    public ArrayList<File> entryFilter(ArrayList<File> ogList, String searchEntry)
    {
       if (searchEntry.equals("")) //NO SEARCH NEEDED RETURN LIST AS IS
@@ -611,6 +643,8 @@ public class Main extends Application {
       }
       return ogList;
    }
+   
+   
    public ArrayList<File> subjectFilter(ArrayList<File> ogList, String filterChoice)
    {
    //filters down the list to items that have specified subject
@@ -679,18 +713,98 @@ public class Main extends Application {
       return exists;
    }
 	
-	//scene for shopping cart, accessed via shopping cart button
+
+   
+   //scene for shopping cart, accessed via shopping cart button
 	Scene createCart() {
-		Button goBack = new Button("Back");
-		Label cartLabel = new Label("Shopping Cart Page");
-		CartS = new Scene(cartPane,400,400);
-		cartVBox.getChildren().addAll(cartLabel,goBack);
-		cartPane.setCenter(cartVBox);
-      goBack.setOnAction(e -> {
+		//go through the InCartISBN until index is null, match with ISBN of setOfBooks, if match display book, otherwise do not
+		Integer totalCost = 0;
+		Button goBack = new Button ("Back");
+		Button completePurchase = new Button ("Complete Purchase");
+		Label cartLabel = new Label ("Shopping Cart Page");
+		VBox currentCart = new VBox();//going to create a VBox with all items currently in Cart
+		
+		//iterate through InCartISBN and match to setOfBooks
+		for (int i = 0; i < InCartISBN.size();++i){
+			
+			Button removeButton = new Button("Remove");
+			ArrayList<String> myListing = getBookInfo(InCartISBN.get(i));
+			Label imageV1 = new Label("Image Here");
+			//want a pop up that displays lable below!!!
+			Label purchaseDone = new Label ("Purchase Complete, Thank You");
+			
+			String currentISBN = InCartISBN.get(i);
+			
+			File cartFolder1 = new File(System.getProperty("user.dir") + "/images_folder");
+	        File[] cartArray1 = cartFolder1.listFiles(file1 -> file1.exists() && file1.isFile() && file1.getName().startsWith(currentISBN));
+	        Image cartPic = new Image(cartArray1[0].toURI().toString());
+	        ImageView cartPicView = new ImageView(cartPic);
+	               cartPicView.setFitWidth(100);
+	               cartPicView.setFitHeight(100);
+			
+			Label titleV2 = new Label("Title : " + myListing.get(1));
+			Label conditionV2 = new Label("Condition : " + myListing.get(4));
+			Label categoryV2 = new Label("Category : " + myListing.get(3));
+			
+			Label priceV3 = new Label("Price : " + myListing.get(5));
+			Integer thisCost =Integer.valueOf(myListing.get(5));
+			
+			totalCost += thisCost;
+			
+			VBox v1 = new VBox();
+		    v1.setPadding(new Insets(10,10,10,10));
+			v1.getChildren().addAll(cartPicView);
+			VBox v2 = new VBox();
+			v2.setPadding(new Insets(10,10,10,10));
+			v2.getChildren().addAll(titleV2, conditionV2, categoryV2);
+			VBox v3 = new VBox();
+			v3.setPadding(new Insets(10,10,10,10));
+			v3.getChildren().addAll(priceV3, removeButton);
+			
+			
+			//Label thisLabel = new Label(InCartISBN.get(i));
+			HBox details = new HBox();
+		    details.setPadding(new Insets(10,10,10,10));
+			details.getChildren().addAll(v1,v2,v3);
+			currentCart.getChildren().add(details);
+			
+	
+			removeButton.setOnAction(p -> {
+				int theInt = getPosition(currentISBN);
+				InCartISBN.remove(theInt);
+				Scene newCartAfterRemoval = createCart();
+				stage1.setScene(newCartAfterRemoval);
+		  });
+
+		}
+		BorderPane newPane = new BorderPane();
+		Scene newCart = new Scene(newPane,400,400);
+		HBox buttonJunk = new HBox();
+		String cartTotal = Integer.toString(totalCost);
+		Label cartTotalLable = new Label ("Total : $" + cartTotal);
+		buttonJunk.setPadding(new Insets(10,10,10,10));
+		buttonJunk.getChildren().addAll(completePurchase,goBack,cartTotalLable);
+		newPane.setCenter(currentCart);
+		newPane.setBottom(buttonJunk);
+		
+		goBack.setOnAction(e -> {
          Scene newBrowsingPage = createBrowsingPage(stage1);//recreates the browsing page
          stage1.setScene(newBrowsingPage); 
       });
-		return CartS;
+		
+		completePurchase.setOnAction(e->{
+			while (!InCartISBN.isEmpty()){
+				
+				removeListing(InCartISBN.remove(0));
+
+			}
+			
+			Scene newCartAfterRemoval = createCart();
+			stage1.setScene(newCartAfterRemoval);
+			
+			//remove books from fileSystem as well and update browsingPage
+		});
+		return newCart;
 		
 		//viewCart()
 	}
@@ -888,6 +1002,35 @@ public class Main extends Application {
          System.out.println(resultArray[0]);
          return resultArray[0];
    }
+   
+   //get's Position in InCartISBN of specific book
+   public int getPosition(String positionOfISBN) {
+	   int t = 0;
+	   int found = 0;
+	  
+	   while(found == 0) {
+		   if(positionOfISBN.equals(InCartISBN.get(t))){
+			   found = 1;
+		   }
+		   else {
+			   found = 0;
+			   ++t;
+			   
+		   }
+	   }
+	   return t;
+   }
+   
+   
+   //done after purchase is complete
+   public void removeListing(String ISBN) {
+	   //remove Listings  in cart from the filesystem
+	   //Should probably update transaction info of appropriate users here too
+	   String filePath2delete = System.getProperty("user.dir") + "/market_listings/Listing_" + ISBN + ".txt";
+	   File deleteMe = new File(filePath2delete);
+	   deleteMe.delete();
+   }
+   
    
    public boolean uploadImage(String ISBN)
    {
