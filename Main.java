@@ -168,24 +168,15 @@ public class Main extends Application {
 
 				if (folder.exists()) {
 					int successful = 0;
-					File[] files = folder.listFiles((file -> file.isFile() && !file.getName().equals(".DS_Store"))); // array
-																														// of
-																														// all
-																														// files
-																														// in
-																														// folder
+					File[] files = folder.listFiles((file -> file.isFile() && !file.getName().equals(".DS_Store"))); // array of all files in folder
+																														
 					int num = 1;
 
 					for (File file : files) {
-						// System.out.println("Round " + num);
 						try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 							String infoLine = "";
 							if ((infoLine = br.readLine()) != null) {
 								String[] array = infoLine.split("\\|");
-								// System.out.println("Round " +num+ ": Array Length: " + array.length);
-								// System.out.println("Reading file: " + file.getName());
-								// for(int i = 0; i < array.length; i++) //DEBUG
-								// System.out.println(array[i]);
 
 								if (array[1].equals(email) && array[2].equals(password)) {
 									showAlert("Success", "Login successful!");
@@ -318,6 +309,7 @@ public class Main extends Application {
 				for (int i = 0; i < InCartISBN.size(); ++i) {
 					if (inCartNUMisbn.equals((InCartISBN).get(i))) {
 						found = 1;
+						showAlert("Exists", "Book Already in Cart");
 					}
 				}
 				if (found == 0) {
@@ -685,7 +677,8 @@ public class Main extends Application {
 		Button completePurchase = new Button("Complete Purchase");
 		Label cartLabel = new Label("Shopping Cart Page");
 		VBox currentCart = new VBox();// going to create a VBox with all items currently in Cart
-
+		Label emailHere = new Label ("Email : " );
+		Label addressHere = new Label ("Address : ");
 		HBox shippingDetails = new HBox();
 		VBox deliveryVBox = new VBox();
 		TextField address = new TextField();
@@ -700,7 +693,7 @@ public class Main extends Application {
 		pickUpOption.setToggleGroup(optionGroup);
 		shipOption.setSelected(true);
 
-		deliveryVBox.getChildren().addAll(shipOption, address, email, pickUpOption);
+		deliveryVBox.getChildren().addAll(shipOption, addressHere, address, emailHere, email, pickUpOption);
 		shippingDetails.getChildren().addAll(deliveryVBox);
 
 		// iterate through InCartISBN and match to setOfBooks
@@ -787,13 +780,13 @@ public class Main extends Application {
 		completePurchase.setOnAction(e -> {
 			if (shipOption.isSelected()) {
 				if (InCartISBN.isEmpty() == true) {
-					System.out.print("Nothing in cart");
+					showAlert("Error", "Cart Is Empty");
 				}
 				if (address.getText().equals("")) {
-					System.out.print("Please put an address");
+					showAlert("Error", "Please put an address");
 
 				} else if (email.getText().equals("")) {
-					System.out.print("Please put an email");
+					showAlert("Error", "Please put an email");
 				} else {
 					address.clear();
 					email.clear();
@@ -883,11 +876,11 @@ public class Main extends Application {
 		cbSubject.getItems().addAll("Natural Science", "Computer", "Math", "English Language", "Novel", "Sci-Fi",
 				"Other");
 		cbSubject.getSelectionModel().selectFirst();
-		// TextField tfSubject = new TextField();
+
 		subjectBox.getChildren().addAll(lbSubject, cbSubject);
 		HBox conditionBox = new HBox();
 		Label lbCondition = new Label("Condition: ");
-		// TextField tfCondition = new TextField();
+
 		ComboBox<String> cbCondition = new ComboBox<>();
 		cbCondition.getItems().addAll("Brand New", "Used- Like New", "Moderately Used", "Heavily Used");
 		cbCondition.getSelectionModel().selectFirst();
@@ -907,29 +900,26 @@ public class Main extends Application {
 
 		generatePrice.setOnAction(l -> {
 			if (tfIsbn.getText().equals("") || tfIsbn.getLength() != 13) {
-				System.out.print("Please input the 13 digit ISBN");
+				showAlert("Error", "Please input the 13 digit ISBN");
 			}
-			if (tfTitle.getText().equals("")) {
-				System.out.print("missing fields");
-			}
-			if (tfAuthor.getText().equals("")) {
-				System.out.print("missing fields");
+			if (tfTitle.getText().equals("") || tfAuthor.getText().equals("")) {
+				showAlert("Error", "missing fields");
 			}
 			if (tfPrice.getText().equals("") || tfPrice.getLength() > 10) {
-				System.out.print("Please Put in a whole number within a 1-10 digit range");
+				showAlert("Error", "Please Put in a whole number within a 1-10 digit range");
 			}
 
 			Boolean isbnIsNum = isAnum(tfIsbn.getText());
 
 			if (isbnIsNum == false) {
-				System.out.print("please insert a number for ISBN");
+				showAlert("Error", "please insert a number for ISBN");
 				tfIsbn.clear();
 			}
 
 			Boolean priceIsNum = isAnum(tfPrice.getText());
 
 			if (priceIsNum == false) {
-				System.out.println("please a whole Number for Price" + priceIsNum);
+				showAlert("Error", "please a whole Number for Price" + priceIsNum);
 				tfPrice.clear();
 			}
 
@@ -997,7 +987,7 @@ public class Main extends Application {
 						// display pic
 					} else {
 						// send alert saying something went wrong
-						System.out.println("pic didn't upload correctly");
+						showAlert("Error", "pic didn't upload correctly");
 					}
 				});
 
@@ -1006,10 +996,7 @@ public class Main extends Application {
 					Listing newListing = new Listing(tfTitle1.getText(), tfAuthor1.getText(), tfSubject1.getText(),
 							tfCondition1.getText(), newPrice, tfIsbn1.getText(), "true", currentID);
 					String condensedMaterial = newListing.fileString();
-					NewListingCreator uploadListing = new NewListingCreator(tfIsbn.getText(), condensedMaterial);// ISBN
-																													// ,
-																													// book
-																													// information
+					NewListingCreator uploadListing = new NewListingCreator(tfIsbn.getText(), condensedMaterial);// ISBN, book information
 					Scene newBrowsingPage = createBrowsingPage(stage1);// recreates the browsing page
 					stage1.setScene(newBrowsingPage);
 
@@ -1037,9 +1024,7 @@ public class Main extends Application {
 			newPrice = priceDouble * 0.60;
 		} else if (condition.equals("Heavily Used")) {
 			newPrice = priceDouble * 0.40;
-		} else {
-			System.out.print("error this should not be possible. fix input handling");
-		}
+		} 
 		String result = String.valueOf(newPrice);
 		String[] resultArray = result.split("\\.");
 		System.out.println(resultArray[0]);
@@ -1114,7 +1099,7 @@ public class Main extends Application {
 	}
 
 	public void storeTransaction(String ISBN) {
-		// add file to Transactiondatabsee
+		// add file to Transaction databsee
 		File storeTransactionPath = new File(System.getProperty("user.dir") + "/completed_transactions/" + ISBN + "_Transaction.txt");
 		File folder = new File(System.getProperty("user.dir") + "/market_listings");
 		File[] array = folder
@@ -1141,6 +1126,7 @@ public class Main extends Application {
 						String dateSold = date.toString();
 						Transaction newTransaction = new Transaction(bookName, bookAuthor, bookSubject, bookCondition,
 								bookPrice, bookISBN, status, sellerID, buyerID, dateSold);
+						
 						String transactionInfo = newTransaction.fileString();
 						NewTransactionCreator storeFile = new NewTransactionCreator(bookISBN, transactionInfo);
 						break;
@@ -1151,12 +1137,12 @@ public class Main extends Application {
 			}
 		}
 	}
+	
+	
 
 	public Scene displayProfile2() {
 		File folder = new File(System.getProperty("user.dir") + "/user_database");
-		File[] array = folder.listFiles(file -> file.exists() && file.isFile() && file.getName().endsWith("_User.txt")); // array
-																															// of
-																															// users
+		File[] array = folder.listFiles(file -> file.exists() && file.isFile() && file.getName().endsWith("_User.txt")); // array of users
 		String[] splitUpInfo = new String[10];
 		for (File file : array) {
 			try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -1188,7 +1174,7 @@ public class Main extends Application {
 			stage1.setScene(newBrowsingPage); // Set the new scene
 		});
 		ObservableList<Listing> list = FXCollections.observableArrayList();
-		viewCurrentListings.setOnAction(f -> {
+		viewCurrentListings.setOnAction(f -> {//here NOOR
 			TableView<Listing> moot = new TableView();
 			TableColumn<Listing, String> isbn = new TableColumn<>("ISBN");
 			TableColumn<Listing, String> title = new TableColumn<>("Title");
@@ -1201,22 +1187,21 @@ public class Main extends Application {
 
 			moot.setEditable(false);
 
-			isbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
-			title.setCellValueFactory(new PropertyValueFactory<>("title"));
-			author.setCellValueFactory(new PropertyValueFactory<>("author"));
-			subject.setCellValueFactory(new PropertyValueFactory<>("subject"));
-			condition.setCellValueFactory(new PropertyValueFactory<>("condition"));
-			price.setCellValueFactory(new PropertyValueFactory<>("price"));
-			status.setCellValueFactory(new PropertyValueFactory<>("isActive"));
-			sellerID.setCellValueFactory(new PropertyValueFactory<>("sellerid"));
+			isbn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIsbn()));
+			title.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTitle()));
+			author.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAuthor()));
+			subject.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getSubject()));
+			condition.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCondition()));
+			price.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrice()));
+			status.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIsActive()));
+			sellerID.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getSellerid()));
 
 			moot.getColumns().addAll(title, author, subject, condition, price, isbn, status, sellerID);
 
 			ArrayList<String[]> userListings = new ArrayList<>();// each index holds an array of the information
 			Scene currentListingsTable;
 			File folder5 = new File(System.getProperty("user.dir") + "/market_listings");
-			File[] arrayOfAllFiles = folder5
-					.listFiles(file -> file.exists() && file.isFile() && file.getName().startsWith("Listing_"));
+			File[] arrayOfAllFiles = folder5.listFiles(file -> file.exists() && file.isFile() && file.getName().startsWith("Listing_"));
 			for (File file : arrayOfAllFiles) {
 				String info;
 				String[] splitUpInfo1 = new String[10];
@@ -1250,7 +1235,8 @@ public class Main extends Application {
 				moot.setItems(list);
 				pane.getChildren().addAll(realBackButton, moot);
 				currentListingsTable = new Scene(pane, 800, 600); // Recreate the browsing page
-			} else {
+			} 
+			else {
 				Label lbl = new Label("No Current Listings Available");
 				pane.getChildren().addAll(realBackButton, lbl);
 				currentListingsTable = new Scene(pane, 400, 400);
@@ -1258,8 +1244,80 @@ public class Main extends Application {
 			stage1.setScene(currentListingsTable);
 		});
 		viewPastTransactions.setOnAction(v -> {
-			createTable();
-			// stage1.setScene(sceneWOW);
+			ObservableList<Transaction> listTransactions = FXCollections.observableArrayList();
+			TableView<Transaction> moot = new TableView();
+			TableColumn<Transaction, String> isbn = new TableColumn<>("ISBN");
+			TableColumn<Transaction, String> title = new TableColumn<>("Title");
+			TableColumn<Transaction, String> author = new TableColumn<>("Author");
+			TableColumn<Transaction, String> subject = new TableColumn<>("Subject");
+			TableColumn<Transaction, String> condition = new TableColumn<>("Condition");
+			TableColumn<Transaction, String> price = new TableColumn<>("Price");
+			TableColumn<Transaction, String> status = new TableColumn<>("Status");
+			TableColumn<Transaction, String> sellerID = new TableColumn<>("SellerID");
+			TableColumn<Transaction, String> buyerID = new TableColumn<>("BuyerID");
+			TableColumn<Transaction, String> dateSold = new TableColumn<>("Date Sold");
+
+			moot.setEditable(false);
+
+			isbn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIsbn()));
+			title.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTitle()));
+			author.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAuthor()));
+			subject.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getSubject()));
+			condition.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCondition()));
+			price.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrice()));
+			status.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getStatus()));
+			sellerID.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getSellerID()));
+			buyerID.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getBuyerID()));
+			dateSold.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDateSold()));
+
+			moot.getColumns().addAll(title, author, subject, condition, price, isbn, status, sellerID, buyerID, dateSold);
+
+			ArrayList<String[]> userListings = new ArrayList<>();// each index holds an array of the information
+			Scene currentListingsTable;
+			File folder5 = new File(System.getProperty("user.dir") + "/completed_transactions");
+			File[] arrayOfAllFiles = folder5
+					.listFiles(file -> file.exists() && file.isFile() && file.getName().endsWith("_Transaction.txt"));
+			System.out.println("Array Size: " + arrayOfAllFiles.length);
+			for (File file : arrayOfAllFiles) {
+				String info;
+				String[] splitUpInfo1 = new String[10];
+				try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+					String infoLine;
+					if ((infoLine = br.readLine()) != null) {
+						splitUpInfo1 = infoLine.split("\\|");
+						if (splitUpInfo1[7].equals(currentID) || splitUpInfo1[8].equals(currentID)) {
+							userListings.add(splitUpInfo1);
+						}
+					}
+				} catch (IOException q) {
+					// exception
+				}
+			}
+			VBox pane = new VBox(5);
+			Button realBackButton = new Button("Back");
+			realBackButton.setOnAction(k -> {
+				Scene newProfileDisplay = displayProfile2(); // Recreate the browsing page
+				stage1.setScene(newProfileDisplay); // Set the new scene
+			});
+			if (!userListings.isEmpty()) {
+				for (int i = 0; i < userListings.size(); i++) // goes through each listing
+				{
+					String[] fileInfo = userListings.get(i); // infoLine
+					// System.out.println("ISBN: " + fileInfo[0]);
+					listTransactions.add(new Transaction(fileInfo[0], fileInfo[1], fileInfo[2], fileInfo[3], fileInfo[4],
+							fileInfo[5], fileInfo[6], fileInfo[7], fileInfo[8], fileInfo[9]));
+				}
+				pane.setPadding(new Insets(10, 0, 0, 10));
+				moot.setItems(listTransactions);
+				pane.getChildren().addAll(realBackButton, moot);
+				currentListingsTable = new Scene(pane, 1000, 600); // Recreate the browsing page
+			} else {
+				Label lbl = new Label("No Past Transactions Available");
+				pane.getChildren().addAll(realBackButton, lbl);
+				currentListingsTable = new Scene(pane, 400, 400);
+			}
+
+			stage1.setScene(currentListingsTable);
 		});
 		return newScene;
 	}
@@ -1314,14 +1372,14 @@ public class Main extends Application {
 
 			moot.setEditable(false);
 
-			isbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
-			title.setCellValueFactory(new PropertyValueFactory<>("title"));
-			author.setCellValueFactory(new PropertyValueFactory<>("author"));
-			subject.setCellValueFactory(new PropertyValueFactory<>("subject"));
-			condition.setCellValueFactory(new PropertyValueFactory<>("condition"));
-			price.setCellValueFactory(new PropertyValueFactory<>("price"));
-			status.setCellValueFactory(new PropertyValueFactory<>("isActive"));
-			sellerID.setCellValueFactory(new PropertyValueFactory<>("sellerid"));
+			isbn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIsbn()));
+			title.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTitle()));
+			author.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAuthor()));
+			subject.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getSubject()));
+			condition.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCondition()));
+			price.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrice()));
+			status.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIsActive()));
+			sellerID.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getSellerid()));
 
 			moot.getColumns().addAll(title, author, subject, condition, price, isbn, status, sellerID);
 
@@ -1370,8 +1428,83 @@ public class Main extends Application {
 			}
 			stage1.setScene(currentListingsTable);
 		});
+		
+		
 		viewPastTransactions.setOnAction(v -> {
-			createTable();
+			
+			ObservableList<Transaction> listTransactions = FXCollections.observableArrayList();
+			TableView<Transaction> moot = new TableView();
+			TableColumn<Transaction, String> isbn = new TableColumn<>("ISBN");
+			TableColumn<Transaction, String> title = new TableColumn<>("Title");
+			TableColumn<Transaction, String> author = new TableColumn<>("Author");
+			TableColumn<Transaction, String> subject = new TableColumn<>("Subject");
+			TableColumn<Transaction, String> condition = new TableColumn<>("Condition");
+			TableColumn<Transaction, String> price = new TableColumn<>("Price");
+			TableColumn<Transaction, String> status = new TableColumn<>("Status");
+			TableColumn<Transaction, String> sellerID = new TableColumn<>("SellerID");
+			TableColumn<Transaction, String> buyerID = new TableColumn<>("BuyerID");
+			TableColumn<Transaction, String> dateSold = new TableColumn<>("Date Sold");
+
+			moot.setEditable(false);
+
+			isbn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIsbn()));
+			title.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTitle()));
+			author.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAuthor()));
+			subject.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getSubject()));
+			condition.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCondition()));
+			price.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrice()));
+			status.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getStatus()));
+			sellerID.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getSellerID()));
+			buyerID.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getBuyerID()));
+			dateSold.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDateSold()));
+
+			moot.getColumns().addAll(title, author, subject, condition, price, isbn, status, sellerID, buyerID, dateSold);
+
+			ArrayList<String[]> userListings = new ArrayList<>();// each index holds an array of the information
+			Scene currentListingsTable;
+			File folder5 = new File(System.getProperty("user.dir") + "/completed_transactions");
+			File[] arrayOfAllFiles = folder5.listFiles(file -> file.exists() && file.isFile() && file.getName().endsWith("_Transaction.txt"));
+			System.out.println("Array Size: " + arrayOfAllFiles.length);
+			for (File file : arrayOfAllFiles) {
+				String info;
+				String[] splitUpInfo1 = new String[10];
+				try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+					String infoLine;
+					if ((infoLine = br.readLine()) != null) {
+						splitUpInfo1 = infoLine.split("\\|");
+						if (splitUpInfo1[7].equals(currentID) || splitUpInfo1[8].equals(currentID)) {
+							userListings.add(splitUpInfo1);
+						}
+					}
+				} catch (IOException q) {
+					// exception
+				}
+			}
+			VBox pane = new VBox(5);
+			Button realBackButton = new Button("Back");
+			realBackButton.setOnAction(k -> {
+				Scene newProfileDisplay = displayProfile2(); // Recreate the browsing page
+				stage1.setScene(newProfileDisplay); // Set the new scene
+			});
+			if (!userListings.isEmpty()) {
+				for (int i = 0; i < userListings.size(); i++) // goes through each listing
+				{
+					String[] fileInfo = userListings.get(i); // infoLine
+					// System.out.println("ISBN: " + fileInfo[0]);
+					listTransactions.add(new Transaction(fileInfo[0], fileInfo[1], fileInfo[2], fileInfo[3], fileInfo[4],
+							fileInfo[5], fileInfo[6], fileInfo[7], fileInfo[8], fileInfo[9]));
+				}
+				pane.setPadding(new Insets(10, 0, 0, 10));
+				moot.setItems(listTransactions);
+				pane.getChildren().addAll(realBackButton, moot);
+				currentListingsTable = new Scene(pane, 1000, 600); // Recreate the browsing page
+			} else {
+				Label lbl = new Label("No Past Transactions Available");
+				pane.getChildren().addAll(realBackButton, lbl);
+				currentListingsTable = new Scene(pane, 400, 400);
+			}
+
+			stage1.setScene(currentListingsTable);
 			//stage1.setScene(sceneWOW);
 		});
 		return newScene;
@@ -1393,16 +1526,16 @@ public class Main extends Application {
 
 		moot.setEditable(false);
 
-		isbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
-		title.setCellValueFactory(new PropertyValueFactory<>("title"));
-		author.setCellValueFactory(new PropertyValueFactory<>("author"));
-		subject.setCellValueFactory(new PropertyValueFactory<>("subject"));
-		condition.setCellValueFactory(new PropertyValueFactory<>("condition"));
-		price.setCellValueFactory(new PropertyValueFactory<>("price"));
-		status.setCellValueFactory(new PropertyValueFactory<>("status"));
-		sellerID.setCellValueFactory(new PropertyValueFactory<>("sellerID"));
-		buyerID.setCellValueFactory(new PropertyValueFactory<>("buyerID"));
-		dateSold.setCellValueFactory(new PropertyValueFactory<>("dateSold"));
+		isbn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getIsbn()));
+		title.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTitle()));
+		author.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAuthor()));
+		subject.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getSubject()));
+		condition.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCondition()));
+		price.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPrice()));
+		status.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getStatus()));
+		sellerID.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getSellerID()));
+		buyerID.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getBuyerID()));
+		dateSold.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDateSold()));
 
 		moot.getColumns().addAll(title, author, subject, condition, price, isbn, status, sellerID, buyerID, dateSold);
 
