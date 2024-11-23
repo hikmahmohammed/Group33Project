@@ -1,70 +1,92 @@
 package application;
+import java.io.*;
+import java.util.*;
 
-import java.util.Date;
+public class Transaction
+{
+   private String bookName;
+   private String bookAuthor;
+   private String bookSubject;
+   private String bookCondition;
+   private String bookPrice;
+   private String bookISBN;
+   private String status;
+   private String sellerID;
+   private String buyerID;
+   private String dateSold;
+   
+   public Transaction(String BOOKNAME, String BOOKAUTHOR,String BOOKSUBJECT,String BOOKCONDITION,String BOOKPRICE,String BOOKISBN,String STATUS,String SELLERID,String BUYERID,String DATESOLD)
+   {
+   bookName = BOOKNAME;
+   bookAuthor = BOOKAUTHOR;
+   bookSubject = BOOKSUBJECT;
+   bookCondition = BOOKCONDITION;
+   bookPrice = BOOKPRICE;
+   bookISBN = BOOKISBN;
+   status = STATUS; //should be unavailable
+   sellerID = SELLERID;
+   buyerID = BUYERID;
+   dateSold = DATESOLD;
+   }
+   
+   //produces a "Transaction" to be stored when books are purchases
+   //Use arrayList when getting information from information in the database
+//list.get(0) = bookName 
+//list.get(1) = bookAuthor
+//list.get(2) = bookSubject
+//list.get(3) = bookCondition
+//list.get(4) = bookPrice
+//list.get(5) = bookISBN
+//list.get(6) = status
+//list.get(7) = sellerID
+//list.get(8) = buyerID
+//list.get(9) = dateSold
+   public String fileString()
+   {
+      String toString = bookName + "|" + bookAuthor+ "|"+bookSubject+ "|"+bookCondition+ "|"+bookPrice+ "|"+bookISBN+ "|"+status+ "|"+sellerID+ "|"+buyerID+ "|"+dateSold;
+      
+      return toString;
+   }
 
-public class Transaction {
-    // Variables
-    private User buyer;
-    private User seller;
-    private Book book;
-    private Date transactionDate;
-    private double amount;
+   public String getTitle()
+   {
+   return this.bookName;
+   } 
+   public String getAuthor()
+   {
+   return this.bookAuthor;
+   } 
+   public String getSubject()
+   {
+   return this.bookSubject;
+   } 
+   public String getCondition()
+   {
+   return this.bookCondition;
+   } 
+   public String getPrice()
+   {
+   return this.bookPrice;
+   } 
+   public String getIsbn()
+   {
+      return this.bookISBN;
+   } 
+   public String getStatus()
+   {
+      return this.status;
+   } 
+   public String getSellerID()
+   {
+      return this.sellerID;
+   } 
+   public String getBuyerID()
+   {
+      return this.buyerID;
+   } 
+   public String getDateSold()
+   {
+      return this.dateSold;
+   } 
 
-    // Constructor
-    public Transaction(User buyer, User seller, Book book, Date transactionDate, double amount) {
-        this.buyer = buyer;
-        this.seller = seller;
-        this.book = book;
-        this.transactionDate = transactionDate;
-        this.amount = amount;
-    }
-
-    // Gets and Sets
-    public User getBuyer() {
-        return buyer;
-    }
-
-    public void setBuyer(User buyer) {
-        this.buyer = buyer;
-    }
-
-    public User getSeller() {
-        return seller;
-    }
-
-    public void setSeller(User seller) {
-        this.seller = seller;
-    }
-
-    public Book getBook() {
-        return book;
-    }
-
-    public void setBook(Book book) {
-        this.book = book;
-    }
-
-    public Date getTransactionDate() {
-        return transactionDate;
-    }
-
-    public void setTransactionDate(Date transactionDate) {
-        this.transactionDate = transactionDate;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
-    // display transaction details
-    public String displayTransactionDetails() {
-        return "Transaction Date: " + transactionDate + "\nBuyer: " + buyer.getUsername() +
-               "\nSeller: " + seller.getUsername() + "\nBook: " + book.getTitle() +
-               "\nAmount: $" + amount;
-    }
 }
-
