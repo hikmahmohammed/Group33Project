@@ -1,0 +1,474 @@
+//Make sure all these are imported
+/*
+import javafx.application.Application;
+import javafx.scene.layout.VBox;
+import javafx.stage.*;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.Scene;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.*;
+import javafx.scene.control.*;
+import java.util.*;
+import java.io.*;
+import java.time.LocalDate;
+import javafx.geometry.*;
+import javafx.scene.image.*;
+import java.nio.file.*;
+import javafx.collections.*;
+*/
+
+//----------------------------------------------------------------------------------------------------------------------------------------------//
+
+//Replace current loginSubmitButton action handler with this one:
+/*
+        loginSubmitButton.setOnAction(e -> {
+            String email = loginEmailField.getText();
+            String password = loginPasswordField.getText();
+            File folder = new File(System.getProperty("user.dir") + "/user_database");
+                        
+            if (folder.exists())
+            {
+               int successful = 0;
+               File[] files = folder.listFiles((file -> file.isFile() && !file.getName().equals(".DS_Store"))); //array of all files in folder
+               int num = 1;
+               
+               for (File file : files)
+               {
+                  //System.out.println("Round " + num);
+                  try (BufferedReader br = new BufferedReader(new FileReader(file)))
+                  {
+                     String infoLine = "";
+                     if ((infoLine = br.readLine()) != null)
+                     {
+                        String[] array = infoLine.split("\\|");
+                        //System.out.println("Round " +num+ ": Array Length: " + array.length);
+                        //System.out.println("Reading file: " + file.getName());
+                        //for(int i = 0; i < array.length; i++) //DEBUG
+                          // System.out.println(array[i]);
+
+                        if (array[1].equals(email) && array[2].equals(password))
+                        {
+                         showAlert("Success", "Login successful!");
+                         loginEmailField.clear();
+                         loginPasswordField.clear();
+                           currentID = array[0]; //SETS CURRENT ID
+                           if (array[3].equals("true"))
+                              currentUserAdmin = true; //SAYS IF ADMIN OR NOT
+                           else 
+                              currentUserAdmin = false; //SAYS IF ADMIN OR NOT
+                         
+                         successful = 1;     
+                         Scene browsingPageS = createBrowsingPage(stage1);
+                         stage1.setScene(browsingPageS);
+                         break;
+                        }
+                     }
+                  }
+                  catch (IOException yomama)
+                  {
+                  //catch
+                  }
+                  num++; //DEBUGGER
+               }
+              if (successful == 0)
+               {
+                  showAlert("Error", "Invalid email or password.");
+               }
+            }
+            else
+            {
+               System.out.print("User doesn't exist yet");
+            }
+        });
+*/
+
+//----------------------------------------------------------------------------------------------------------------------------------------------//
+
+//In createCart() -> replace original event handler with this new one
+/*
+completePurchase.setOnAction(e->{
+   while (!InCartISBN.isEmpty()){
+      storeTransaction(InCartISBN.get(0)); //STORE TRANSACTION IN TRANSACTION DATABSE
+      removeListing(InCartISBN.remove(0)); //REMOVE TRANSACTION FROM LISTING DATABASE
+   }
+   Scene newCartAfterRemoval = createCart();
+   stage1.setScene(newCartAfterRemoval);
+});
+*/
+
+//----------------------------------------------------------------------------------------------------------------------------------------------//
+// Add these methods in the class wherever
+/*
+   public void storeTransaction(String ISBN)
+   {
+      //add file to Transactiondatabsee 
+//       File storeTransactionPath = System.getProperty("user.dir") + "/completed_transactions/" + ISBN + "_Transaction.txt";
+      File folder = new File(System.getProperty("user.dir") + "/market_listings");
+      File[] array = folder.listFiles(file -> file.exists() && file.isFile() && file.getName().startsWith("Listing_"));
+      ArrayList<String> info = new ArrayList<>();
+         for(File file : array)
+         {
+            String[] splitUpInfo = new String[10];
+            try (BufferedReader br = new BufferedReader(new FileReader(file)))
+            {
+               String infoLine;
+               while ((infoLine = br.readLine()) != null)
+               {
+                  splitUpInfo = infoLine.split("\\|");
+                  if (splitUpInfo[0].equals(ISBN)) //BOOK WE MUST ADD
+                  {
+                     String bookName = splitUpInfo[1];
+                     String bookAuthor = splitUpInfo[2];
+                     String bookSubject = splitUpInfo[3];
+                     String bookCondition = splitUpInfo[4];
+                     String bookPrice = splitUpInfo[5];
+                     String bookISBN = splitUpInfo[0];
+                     String status = "Unavailable";
+                     String sellerID = splitUpInfo[7];
+                     String buyerID = currentID;
+                     LocalDate date = LocalDate.now();
+                     String dateSold = date.toString();
+                     Transaction newTransaction = new Transaction(bookName, bookAuthor, bookSubject, bookCondition, bookPrice, bookISBN, status, sellerID, buyerID, dateSold);
+                     String transactionInfo = newTransaction.fileString();
+                     NewTransactionCreator storeFile = new NewTransactionCreator(bookISBN, transactionInfo);
+                     break;
+                  }
+               }
+            }
+            catch (IOException i)
+            {
+               //catch
+            }
+         }
+   }
+   public Scene displayProfile2()
+   {
+      File folder = new File(System.getProperty("user.dir") + "/user_database");
+      File[] array = folder.listFiles(file -> file.exists() && file.isFile() && file.getName().endsWith("_User.txt")); //array of users
+      String[] splitUpInfo = new String[10];
+         for(File file : array)
+         {
+            try (BufferedReader br = new BufferedReader(new FileReader(file)))
+            {
+               String infoLine;
+               while ((infoLine = br.readLine()) != null)
+               {
+                  String[] newarray = infoLine.split("\\|");
+                  if (newarray[0].equals(currentID)) //BOOK WE MUST ADD
+                  {
+                     splitUpInfo = newarray;
+                  }
+               }
+            }
+            catch (IOException i)
+            {
+               //catch
+            }
+         }
+      VBox base = new VBox(10);
+      Button backButton = new Button("Back");
+      Label accountDisplay = new Label("Account Overview");
+      Label userID = new Label("User ID: " + splitUpInfo[0]);
+      Label userEMAIL = new Label("Email: " + splitUpInfo[1]);
+      HBox buttonHbox = new HBox(20);
+         Button viewCurrentListings = new Button("View Your Listings");
+         Button viewPastTransactions = new Button("View Past Transactions");
+         buttonHbox.getChildren().addAll(viewCurrentListings, viewPastTransactions);
+      base.getChildren().addAll(backButton, accountDisplay, userID, userEMAIL, buttonHbox);
+      Scene newScene = new Scene(base, 700,700);
+      backButton.setOnAction(k -> {
+         Scene newBrowsingPage = createBrowsingPage(stage1); // Recreate the browsing page
+         stage1.setScene(newBrowsingPage); // Set the new scene
+      });
+      ObservableList<Listing> list = FXCollections.observableArrayList();
+      viewCurrentListings.setOnAction(f -> {
+         TableView<Listing> moot = new TableView();
+         TableColumn<Listing, String> isbn = new TableColumn<>("ISBN");
+         TableColumn<Listing, String> title = new TableColumn<>("Title");
+         TableColumn<Listing, String> author = new TableColumn<>("Author");
+         TableColumn<Listing, String> subject = new TableColumn<>("Subject");
+         TableColumn<Listing, String> condition = new TableColumn<>("Condition");
+         TableColumn<Listing, String> price = new TableColumn<>("Price");
+         TableColumn<Listing, String> status = new TableColumn<>("Status");
+         TableColumn<Listing, String> sellerID = new TableColumn<>("SellerID");
+         
+         moot.setEditable(false);
+         
+         isbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
+         title.setCellValueFactory(new PropertyValueFactory<>("title"));
+         author.setCellValueFactory(new PropertyValueFactory<>("author"));
+         subject.setCellValueFactory(new PropertyValueFactory<>("subject"));
+         condition.setCellValueFactory(new PropertyValueFactory<>("condition"));
+         price.setCellValueFactory(new PropertyValueFactory<>("price"));
+         status.setCellValueFactory(new PropertyValueFactory<>("isActive"));
+         sellerID.setCellValueFactory(new PropertyValueFactory<>("sellerid"));
+
+         moot.getColumns().addAll(title, author, subject, condition, price, isbn, status, sellerID);
+         
+         ArrayList<String[]> userListings = new ArrayList<>();//each index holds an array of the information
+         Scene currentListingsTable;
+         File folder5 = new File(System.getProperty("user.dir") + "/market_listings");
+         File[] arrayOfAllFiles = folder5.listFiles(file -> file.exists() && file.isFile() && file.getName().startsWith("Listing_"));
+         for(File file : arrayOfAllFiles)
+         {
+            String info;
+            String[] splitUpInfo1 = new String[10];
+            try (BufferedReader br = new BufferedReader(new FileReader(file)))
+            {
+               String infoLine;
+               if ((infoLine = br.readLine()) != null)
+               {
+                  splitUpInfo1 = infoLine.split("\\|");
+                  if (splitUpInfo1[7].equals(currentID))
+                  {
+                     userListings.add(splitUpInfo1);
+                  }
+               }
+            }
+            catch(IOException q) 
+            {
+               //exception
+            }
+         }
+         VBox pane = new VBox(5);
+         Button realBackButton = new Button("Back"); 
+         realBackButton.setOnAction(k -> {
+            Scene newProfileDisplay = displayProfile2(); // Recreate the browsing page
+            stage1.setScene(newProfileDisplay); // Set the new scene
+         });
+         if (!userListings.isEmpty())
+         {
+            for (int i = 0; i < userListings.size(); i++) //goes through each listing
+            {
+               String[] fileInfo = userListings.get(i); //infoLine
+               System.out.println("ISBN: " + fileInfo[0]);
+               list.add(new Listing(fileInfo[1], fileInfo[2], fileInfo[3], fileInfo[4], fileInfo[5], fileInfo[0], fileInfo[6], fileInfo[7]));
+            }    
+               pane.setPadding(new Insets(10,0,0,10));
+               moot.setItems(list);
+               pane.getChildren().addAll(realBackButton, moot);
+               currentListingsTable = new Scene(pane, 800, 600); // Recreate the browsing page
+         }
+         else
+         {
+            Label lbl = new Label("No Current Listings Available");
+            pane.getChildren().addAll(realBackButton, lbl);
+            currentListingsTable = new Scene(pane,400,400);
+         }
+         stage1.setScene(currentListingsTable);
+     });
+      viewPastTransactions.setOnAction(v -> {
+          createTable();
+        // stage1.setScene(sceneWOW);
+         });      
+      return newScene;
+   }
+   public Scene displayProfile()
+   {
+      File folder = new File(System.getProperty("user.dir") + "/user_database");
+      File[] array = folder.listFiles(file -> file.exists() && file.isFile() && file.getName().endsWith("_User.txt")); //array of users
+      String[] splitUpInfo = new String[10];
+         for(File file : array)
+         {
+            try (BufferedReader br = new BufferedReader(new FileReader(file)))
+            {
+               String infoLine;
+               while ((infoLine = br.readLine()) != null)
+               {
+                  String[] newarray = infoLine.split("\\|");
+                  if (newarray[0].equals(currentID)) //BOOK WE MUST ADD
+                  {
+                     splitUpInfo = newarray;
+                  }
+               }
+            }
+            catch (IOException i)
+            {
+               //catch
+            }
+         }
+      VBox base = new VBox(10);
+      Button backButton = new Button("Back");
+      Label accountDisplay = new Label("Account Overview");
+      Label userID = new Label("User ID: " + splitUpInfo[0]);
+      Label userEMAIL = new Label("Email: " + splitUpInfo[1]);
+      HBox buttonHbox = new HBox(20);
+         Button viewCurrentListings = new Button("View Your Listings");
+         Button viewPastTransactions = new Button("View Past Transactions");
+         buttonHbox.getChildren().addAll(viewCurrentListings, viewPastTransactions);
+      base.getChildren().addAll(backButton, accountDisplay, userID, userEMAIL, buttonHbox);
+      Scene newScene = new Scene(base, 700,700);
+      backButton.setOnAction(k -> {
+         Scene newBrowsingPage = createBrowsingPage(stage1); // Recreate the browsing page
+         stage1.setScene(newBrowsingPage); // Set the new scene
+      });
+      ObservableList<Listing> list = FXCollections.observableArrayList();
+      viewCurrentListings.setOnAction(f -> {
+         TableView<Listing> moot = new TableView();
+         TableColumn<Listing, String> isbn = new TableColumn<>("ISBN");
+         TableColumn<Listing, String> title = new TableColumn<>("Title");
+         TableColumn<Listing, String> author = new TableColumn<>("Author");
+         TableColumn<Listing, String> subject = new TableColumn<>("Subject");
+         TableColumn<Listing, String> condition = new TableColumn<>("Condition");
+         TableColumn<Listing, String> price = new TableColumn<>("Price");
+         TableColumn<Listing, String> status = new TableColumn<>("Status");
+         TableColumn<Listing, String> sellerID = new TableColumn<>("SellerID");
+         
+         moot.setEditable(false);
+         
+         isbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
+         title.setCellValueFactory(new PropertyValueFactory<>("title"));
+         author.setCellValueFactory(new PropertyValueFactory<>("author"));
+         subject.setCellValueFactory(new PropertyValueFactory<>("subject"));
+         condition.setCellValueFactory(new PropertyValueFactory<>("condition"));
+         price.setCellValueFactory(new PropertyValueFactory<>("price"));
+         status.setCellValueFactory(new PropertyValueFactory<>("isActive"));
+         sellerID.setCellValueFactory(new PropertyValueFactory<>("sellerid"));
+
+         moot.getColumns().addAll(title, author, subject, condition, price, isbn, status, sellerID);
+         
+         ArrayList<String[]> userListings = new ArrayList<>();//each index holds an array of the information
+         Scene currentListingsTable;
+         File folder5 = new File(System.getProperty("user.dir") + "/market_listings");
+         File[] arrayOfAllFiles = folder5.listFiles(file -> file.exists() && file.isFile() && file.getName().startsWith("Listing_"));
+         for(File file : arrayOfAllFiles)
+         {
+            String info;
+            String[] splitUpInfo1 = new String[10];
+            try (BufferedReader br = new BufferedReader(new FileReader(file)))
+            {
+               String infoLine;
+               if ((infoLine = br.readLine()) != null)
+               {
+                  splitUpInfo1 = infoLine.split("\\|");
+                  if (splitUpInfo1[7].equals(currentID))
+                  {
+                     userListings.add(splitUpInfo1);
+                  }
+               }
+            }
+            catch(IOException q) 
+            {
+               //exception
+            }
+         }
+         VBox pane = new VBox(5);
+         Button realBackButton = new Button("Back"); 
+         realBackButton.setOnAction(k -> {
+            Scene newProfileDisplay = displayProfile2(); // Recreate the browsing page
+            stage1.setScene(newProfileDisplay); // Set the new scene
+         });
+         if (!userListings.isEmpty())
+         {
+            for (int i = 0; i < userListings.size(); i++) //goes through each listing
+            {
+               String[] fileInfo = userListings.get(i); //infoLine
+               System.out.println("ISBN: " + fileInfo[0]);
+               list.add(new Listing(fileInfo[1], fileInfo[2], fileInfo[3], fileInfo[4], fileInfo[5], fileInfo[0], fileInfo[6], fileInfo[7]));
+            }    
+               pane.setPadding(new Insets(10,0,0,10));
+               moot.setItems(list);
+               pane.getChildren().addAll(realBackButton, moot);
+               currentListingsTable = new Scene(pane, 800, 600); // Recreate the browsing page
+         }
+         else
+         {
+            Label lbl = new Label("No Current Listings Available");
+            pane.getChildren().addAll(realBackButton, lbl);
+            currentListingsTable = new Scene(pane,400,400);
+         }
+         stage1.setScene(currentListingsTable);
+     });
+      viewPastTransactions.setOnAction(v -> {
+          createTable();
+        // stage1.setScene(sceneWOW);
+         });      
+      return newScene;
+   }
+   public void createTable()
+   {
+         ObservableList<Transaction> listTransactions = FXCollections.observableArrayList();
+         TableView<Transaction> moot = new TableView();
+         TableColumn<Transaction, String> isbn = new TableColumn<>("ISBN");
+         TableColumn<Transaction, String> title = new TableColumn<>("Title");
+         TableColumn<Transaction, String> author = new TableColumn<>("Author");
+         TableColumn<Transaction, String> subject = new TableColumn<>("Subject");
+         TableColumn<Transaction, String> condition = new TableColumn<>("Condition");
+         TableColumn<Transaction, String> price = new TableColumn<>("Price");
+         TableColumn<Transaction, String> status = new TableColumn<>("Status");
+         TableColumn<Transaction, String> sellerID = new TableColumn<>("SellerID");
+         TableColumn<Transaction, String> buyerID = new TableColumn<>("BuyerID");
+         TableColumn<Transaction, String> dateSold = new TableColumn<>("Date Sold");
+         
+         moot.setEditable(false);
+         
+         isbn.setCellValueFactory(new PropertyValueFactory<>("isbn"));
+         title.setCellValueFactory(new PropertyValueFactory<>("title"));
+         author.setCellValueFactory(new PropertyValueFactory<>("author"));
+         subject.setCellValueFactory(new PropertyValueFactory<>("subject"));
+         condition.setCellValueFactory(new PropertyValueFactory<>("condition"));
+         price.setCellValueFactory(new PropertyValueFactory<>("price"));
+         status.setCellValueFactory(new PropertyValueFactory<>("status"));
+         sellerID.setCellValueFactory(new PropertyValueFactory<>("sellerID"));
+         buyerID.setCellValueFactory(new PropertyValueFactory<>("buyerID"));
+         dateSold.setCellValueFactory(new PropertyValueFactory<>("dateSold"));
+
+         moot.getColumns().addAll(title, author, subject, condition, price, isbn, status, sellerID, buyerID, dateSold);
+         
+         ArrayList<String[]> userListings = new ArrayList<>();//each index holds an array of the information
+         Scene currentListingsTable;
+         File folder5 = new File(System.getProperty("user.dir") + "/completed_transactions");
+         File[] arrayOfAllFiles = folder5.listFiles(file -> file.exists() && file.isFile() && file.getName().endsWith("_Transaction.txt"));
+         System.out.println("Array Size: " + arrayOfAllFiles.length);
+         for(File file : arrayOfAllFiles)
+         {
+            String info;
+            String[] splitUpInfo1 = new String[10];
+            try (BufferedReader br = new BufferedReader(new FileReader(file)))
+            {
+               String infoLine;
+               if ((infoLine = br.readLine()) != null)
+               {
+                  splitUpInfo1 = infoLine.split("\\|");
+                  if (splitUpInfo1[7].equals(currentID) || splitUpInfo1[8].equals(currentID))
+                  {
+                     userListings.add(splitUpInfo1);
+                  }
+               }
+            }
+            catch(IOException q) 
+            {
+               //exception
+            }
+         }
+         VBox pane = new VBox(5);
+         Button realBackButton = new Button("Back"); 
+         realBackButton.setOnAction(k -> {
+            Scene newProfileDisplay = displayProfile2(); // Recreate the browsing page
+            stage1.setScene(newProfileDisplay); // Set the new scene
+         });
+         if (!userListings.isEmpty())
+         {
+            for (int i = 0; i < userListings.size(); i++) //goes through each listing
+            {
+               String[] fileInfo = userListings.get(i); //infoLine
+               //System.out.println("ISBN: " + fileInfo[0]);
+               listTransactions.add(new Transaction(fileInfo[0], fileInfo[1], fileInfo[2], fileInfo[3], fileInfo[4], fileInfo[5], fileInfo[6], fileInfo[7], fileInfo[8], fileInfo[9]));
+            }    
+               pane.setPadding(new Insets(10,0,0,10));
+               moot.setItems(listTransactions);
+               pane.getChildren().addAll(realBackButton, moot);
+               currentListingsTable = new Scene(pane, 1000, 600); // Recreate the browsing page
+         }
+         else
+         {
+            Label lbl = new Label("No Past Transactions Available");
+            pane.getChildren().addAll(realBackButton, lbl);
+            currentListingsTable = new Scene(pane,400,400);
+         }
+      
+      stage1.setScene(currentListingsTable);
+   }
+   
+*/
