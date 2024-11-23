@@ -45,4 +45,37 @@ public class Listing
       
       return toString;
    }
+   public String getIsbn()
+   {
+      return this.isbn;
+   }
+      public String getTitle()
+   {
+      return this.title;
+   }
+      public String getAuthor()
+   {
+      return this.author;
+   }
+      public String getSubject()
+   {
+      return this.subject;
+   }
+      public String getCondition()
+   {
+      return this.condition;
+   }
+      public String getPrice()
+   {
+      return this.price;
+   }
+      public String getIsActive()
+   {
+      return this.isActive;
+   }
+      public String getSellerid()
+   {
+      return this.sellerID;
+   }
+   
 }
